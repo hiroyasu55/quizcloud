@@ -1,0 +1,35 @@
+{
+  "name": "cloudquiz",
+  "version": "0.1.0",
+  "description": "Cloud Quiz",
+  "engines": {
+    "node": "8.9.1"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "ejs": "^2.5.6",
+    "express": "^4.15.2",
+    "aws-sdk": "^2.162.0",
+    "convict": "^4.0.2",
+    "fs": "0.0.1-security",
+    "moment": "^2.19.3",
+    "nanoid": "^1.0.1",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
+    "xml2js": "^0.4.19"
+  },
+  "devDependencies": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/heroku/node-js-getting-started"
+  },
+  "keywords": [
+    "quiz"
+  ],
+  "license": "MIT"
+}
