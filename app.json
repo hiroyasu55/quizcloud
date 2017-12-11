@@ -1,8 +1,0 @@
-{
-  "name": "Start on Heroku: Quiz Cloud",
-  "description": "Quiz Cloud",
-  "repository": "https://github.com/logicheart/quizcloud",
-  "logo": "https://cdn.rawgit.com/heroku/node-js-getting-started/master/public/node.svg",
-  "keywords": ["quiz"],
-  "image": "heroku/nodejs"
-}
