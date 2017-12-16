@@ -1,9 +1,53 @@
-#!/usr/bin/env node
-const conf = require('../config/test.env.js')
+'use strict'
 
+const dynamodb = require('../lib/aws/dynamodb')
+process.env.NODE_ENV = 'development'
 
 /*
-const dynamodb = require("./lib/dynamodb");
+const func = async () => {
+  console.log('1')
+  await (() => { throw new Error('xxxx') })()
+}
+func()
+  .catch(err => {
+    console.log(err)
+    console.error('エラーでたっぽい')
+  })
+*/
+const word = '仏教'
+const tag = word
+dynamodb.scan({
+  FilterExpression: 'contains(#question,:word) and not contains(#tags,:word)',
+  ExpressionAttributeNames: {
+    '#question': 'question',
+    '#tags': 'tags'
+  },
+  ExpressionAttributeValues: {
+    ':word': word
+  }
+}).then(quizes => {
+  for (let quiz of quizes) {
+    quiz.tags = quiz.tags || []
+    if (!quiz.tags.includes(tag)) {
+      quiz.tags.push(word)
+    }
+  }
+  return dynamodb.put(quizes)
+}).then(result => {
+  console.log(result)
+}).catch(err => {
+  console.error(err)
+})
+
+/*
+dynamodb.list(params).then(data => {
+  console.log(data)
+}).catch(err => {
+  console.error(err)
+})
+*/
+
+/*
 
 let item = {
   "question": "刀鍛冶で、親方が槌を打つ後に弟子が槌を一連の動作が元になった言葉。\n相手の話に合わせて、うなづいたり言葉を発したりして応対することを、何を打つと言う？",

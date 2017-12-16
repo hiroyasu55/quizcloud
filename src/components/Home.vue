@@ -24,20 +24,17 @@
     </b-col>
 
     <b-row>
-      {{ message }}
-    </b-row>
-    <b-row>
-      <button @click="dummy()">Dummy</button>
+      <p v-if="message && message.length > 0">
+        {{ message }}
+      </p>
     </b-row>
   </b-container>
 </template>
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-// import { mapGetters } from 'vuex'
 import store from '@/store'
 import { getQuizes } from '@/store/actions'
-// import types from '@/store/mutation-types'
 
 export default {
   computed: {
@@ -63,7 +60,7 @@ export default {
         }
       },
       currentPage: 1,
-      perPage: 5
+      perPage: 10
     }
   },
   created: () => {

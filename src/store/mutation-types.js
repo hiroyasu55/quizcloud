@@ -1,0 +1,6 @@
+export default {
+  COUNT: 'COUNT',
+  ADD_QUIZ: 'ADD_QUIZ',
+  SET_MESSAGE: 'SET_MESSAGE',
+  GET_MESSAGE: 'GET_MESSAGE'
+}
