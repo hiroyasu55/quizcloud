@@ -5,7 +5,8 @@ export const state = {
   quiz: null,
   count: 0,
   message: '',
-  error: null
+  error: null,
+  mode: 'none'
 }
 
 export const mutations = {
@@ -29,6 +30,14 @@ export const mutations = {
   },
   setError (state, error) {
     state.error = error
+  },
+  setMode (state, mode) {
+    state.mode = mode
+  },
+  dummyMutation (state, {text, done}) {
+    if (typeof done === 'function') {
+      done(`dummyMutation:${text}`)
+    }
   }
 /*
   [types.SET_MESSAGE] (state, message) {

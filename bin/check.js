@@ -3,77 +3,42 @@
 const dynamodb = require('../lib/aws/dynamodb')
 process.env.NODE_ENV = 'development'
 
-/*
-const func = async () => {
-  console.log('1')
-  await (() => { throw new Error('xxxx') })()
-}
-func()
-  .catch(err => {
-    console.log(err)
-    console.error('エラーでたっぽい')
-  })
-*/
-const word = '仏教'
-const tag = word
-dynamodb.scan({
-  FilterExpression: 'contains(#question,:word) and not contains(#tags,:word)',
-  ExpressionAttributeNames: {
-    '#question': 'question',
-    '#tags': 'tags'
-  },
-  ExpressionAttributeValues: {
-    ':word': word
-  }
-}).then(quizes => {
-  for (let quiz of quizes) {
-    quiz.tags = quiz.tags || []
-    if (!quiz.tags.includes(tag)) {
-      quiz.tags.push(word)
-    }
-  }
-  return dynamodb.put(quizes)
-}).then(result => {
-  console.log(result)
-}).catch(err => {
-  console.error(err)
-})
-
-/*
-dynamodb.list(params).then(data => {
-  console.log(data)
-}).catch(err => {
-  console.error(err)
-})
-*/
-
-/*
-
-let item = {
-  "question": "刀鍛冶で、親方が槌を打つ後に弟子が槌を一連の動作が元になった言葉。\n相手の話に合わせて、うなづいたり言葉を発したりして応対することを、何を打つと言う？",
-  "answers": [
-    {
-      "answer": "相槌",
-      "kana": "あいづち"
+const setTag = (word, tag) => {
+  dynamodb.scan({
+    FilterExpression: 'contains(#question,:word) and not contains(#tags,:tag)',
+    ExpressionAttributeNames: {
+      '#question': 'question',
+      '#tags': 'tags'
     },
-    {
-      "answer": "相槌をうつ",
-      "kana": "あいづちをうつ"
+    ExpressionAttributeValues: {
+      ':word': word,
+      ':tag': tag
     }
-  ],
-  "note": "刀鍛冶",
-  "tags": ["鍛冶"],
-  "status": true
-};
+  }).then(quizes => {
+    for (let quiz of quizes) {
+      quiz.tags = quiz.tags || []
+      if (!quiz.tags.includes(tag)) {
+        quiz.tags.push(word)
+      }
+    }
+    return dynamodb.put(quizes)
+  }).then(result => {
+    console.log(result)
+  }).catch(err => {
+    console.error(err)
+  })
+}
 
-dynamodb.add(item)
-.then(result => {
-  console.log(result);
+const wordTags = [
+  { word: '芝居', tag: '演劇' },
+  { word: '歌舞伎', tag: '演劇' },
+  { word: '弁当', tag: '食' },
+  { word: '寿司', tag: '食' }
+]
+wordTags.forEach(wordTag => {
+  setTag(wordTag.word, wordTag.tag)
 })
-.catch(err => {
-  console.error(err, err.stack);
-});
-*/
+
 /*
 const xml2js = require("xml2js");
 

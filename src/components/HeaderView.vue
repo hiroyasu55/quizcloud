@@ -3,7 +3,7 @@
     <b-navbar toggleable="md" type="dark fixed-top" variant="info">
       <b-nav-toggle target="nav_collapse"></b-nav-toggle>
 
-      <b-link class="navbar-brand" to="#">
+      <b-link class="navbar-brand" to="/">
        <span>Quiz Cloud</span>
       </b-link>
 

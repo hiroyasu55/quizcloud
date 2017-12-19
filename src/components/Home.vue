@@ -6,20 +6,24 @@
       :items="quizes"
       :current-page="currentPage"
       :per-page="perPage"
-       bordered responsive
+       bordered responsive="sm"
     >
       <template slot="answer" slot-scope="data">
-        <a :href="`/show/${data.item.key}`">
-        {{data.item.answers[0].answer}}
-        </a>
+        <router-link :to="{ name: 'Show', params: { key: data.item.key }}">
+          {{data.item.standard_answer}}
+        </router-link>
       </template>
       <template slot="question" slot-scope="data">
         {{data.value ? data.value.substr(0, 30) : '-'}}
       </template>
+      <template slot="status" slot-scope="data">
+        <b-badge v-if="data.value" variant="primary">有効</b-badge>
+        <b-badge v-if="!data.value" variant="secondary">無効</b-badge>
+      </template>
     </b-table>
     <b-col cols="6">
       <b-pagination
-        :total-rows="store.state.quizes.length"
+        :total-rows="quizes.length"
         :per-page="perPage" v-model="currentPage" />
     </b-col>
 
@@ -33,15 +37,13 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import store from '@/store'
-import { getQuizes } from '@/store/actions'
+import store from '@/store/quiz'
+import { getQuizes } from '@/store/quiz/actions'
 
 export default {
   computed: {
     ...mapGetters({
-      quizes: 'quizes',
-      message: 'message',
-      error: 'error'
+      quizes: 'quizes'
     })
   },
   data () {
@@ -50,13 +52,19 @@ export default {
       fields: {
         answer: {
           label: '正解',
-          md: '7',
           class: 'text-left'
         },
         question: {
           label: '問題',
-          md: '5',
           class: 'text-left text-truncate'
+        },
+        tags: {
+          label: 'タグ',
+          class: 'text-left text-truncate'
+        },
+        status: {
+          label: '状態',
+          class: 'text-left'
         }
       },
       currentPage: 1,
@@ -66,13 +74,11 @@ export default {
   created: () => {
     getQuizes(store)
   },
+  mounted: () => {
+  },
   methods: {
     ...mapMutations([
-      'setMessage',
-      'addQuiz'
-    ]),
-    dummy () {
-    }
+    ])
   }
 }
 </script>

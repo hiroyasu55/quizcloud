@@ -23,7 +23,8 @@ const router = new Router({
       meta: {
         title: 'Show'
       },
-      component: Show
+      component: Show,
+      props: true
     },
     {
       path: '/test',

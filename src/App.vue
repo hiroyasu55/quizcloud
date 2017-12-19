@@ -37,4 +37,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
 }
+
+.pre-wrap {
+  white-space: pre-wrap ;
+}
 </style>
