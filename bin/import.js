@@ -1,60 +1,94 @@
 #!/usr/bin/env node
 
-const API_URL = 'https://1206p.cybozu.com/k/v1/'
-const API_TOKEN = '9sNVc9rvzqH9LQm1eVDvvMrwwfqkNEOvifCp5uMm'
-const APP_ID = 73
+const path = require('path')
+const mongoose = require('mongoose')
+const JSON_FILE = path.resolve(__dirname, '../temp/quizes.json')
 
-const request = require('request-promise')
-const url = require('url')
-const dynamodb = require('../lib/aws/dynamodb')
+const DB_NAME = 'quizcloud'
+const DB_HOST = 'localhost'
+const DB_PORT = '27017'
+const data = require(JSON_FILE)
 
-process.env.NODE_ENV = 'development'
+mongoose.Promise = Promise
 
-let getQuizes = () => {
-  let params = {
-    app: APP_ID,
-    query: 'order by first_answer_kana limit 500 offset 200'
-  }
-  let options = {
-    uri: url.resolve(API_URL, 'records.json'),
-    transform2xxOnly: true, // ステータスコード200以外のときにHTMLページを帰す場合はtrueにする
-    headers: {
-      'X-Cybozu-API-Token': API_TOKEN
-    },
-    json: true,
-    qs: params
-  }
+const url = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`
+mongoose.connect(url, { useMongoClient: true })
 
-  return request(options).then((res) => {
-    let quizes = []
-    for (let record of res.records) {
-      let quiz = {
-        question: record.question.value,
-        answers: [],
-        tags: record.category.value.concat(record.language.value),
-        note: record.note.value,
-        status: (record.status.value[0] === '有効')
-      }
-      for (let ans of record.answers.value) {
-        quiz.answers.push({
-          answer: ans.value.answer.value,
-          kana: ans.value.answer_kana.value
-        })
-      }
-      quizes.push(quiz)
-    }
-    return quizes
+const schema = mongoose.Schema(
+  {
+    question: String,
+    standard_answer: String,
+    standard_answer_kana: String,
+    answers: [{ answer: String, kana: String }],
+    tags: { type: [String], index: true },
+    note: String,
+    status: Boolean,
+    created: Date,
+    modified: Date
+  }, {
+    collection: 'quiz'
   })
+
+const Quiz = mongoose.model('Quiz', schema)
+
+const addQuiz = quiz => {
+  const now = Date.now()
+
+  const q = new Quiz({
+    question: quiz.question,
+    standard_answer: quiz.standard_answer,
+    standard_answer_kana: quiz.standard_answer_kana,
+    answers: quiz.answers,
+    tags: quiz.tags,
+    note: quiz.note,
+    status: quiz.status,
+    created: now,
+    modified: now
+  })
+
+  return q.save()
 }
 
-getQuizes()
-  .then(quizes => {
-    console.log(quizes)
-    return dynamodb.put(quizes)
+let promises = []
+for (let d of data) {
+  let quiz = {
+    question: d.question,
+    standard_answer: d.standard_answer,
+    standard_answer_kana: d.standard_answer_kana,
+    answers: d.answers,
+    tags: d.tags,
+    note: d.note,
+    status: d.status
+  }
+  promises.push(Promise.resolve().then(() => {
+    console.log(quiz.standard_answer)
+    return addQuiz(quiz)
+  }))
+}
+
+Promise.resolve()
+  .then(() => {
+    return Quiz.remove()
+  })
+  .then(() => {
+    return Promise.all(promises)
   })
   .then(result => {
-    console.log(result)
+    console.log(result.length)
+    return Quiz
+      .where('tags').in(['スポーツ-相撲'])
+      // .sort('+standard_answer_kana')
+  })
+  .then(quizes => {
+    for (let quiz of quizes) {
+      console.log(`${quiz._id} ${quiz.standard_answer} ${quiz.tags}`)
+    }
+    return mongoose.connection.close()
+  })
+  .then(() => {
+    console.log('close')
   })
   .catch(err => {
     console.error(err)
+    mongoose.connection.close()
   })
