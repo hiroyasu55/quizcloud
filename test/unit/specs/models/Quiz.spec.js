@@ -1,6 +1,5 @@
 import MongoDB from '@/models/MongoDB'
 import Quiz from '@/models/Quiz'
-import data from '@/../temp/quizes.json'
 
 let db
 

@@ -13,15 +13,6 @@ export default {
   name: 'app',
   components: {
     headerView
-  },
-  data () {
-    return {
-      welcome: 'welcome.app'
-    }
-  },
-  created: () => {
-    this.welcome = 'welcome.app.created'
-    console.log('app.created')
   }
 }
 </script>

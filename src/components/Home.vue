@@ -37,18 +37,18 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import store from '@/store/quiz'
-import { getQuizes } from '@/store/quiz/actions'
+// import store from '@/store/quiz'
+// import { getQuizes } from '@/store/quiz/actions'
 
 export default {
   computed: {
     ...mapGetters({
-      quizes: 'quizes'
+      // quizes: 'quizes'
     })
   },
   data () {
     return {
-      store: store,
+      // store: store,
       fields: {
         answer: {
           label: '正解',
@@ -72,7 +72,7 @@ export default {
     }
   },
   created: () => {
-    getQuizes(store)
+    // getQuizes(store)
   },
   mounted: () => {
   },

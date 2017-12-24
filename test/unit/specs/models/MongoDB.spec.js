@@ -17,6 +17,7 @@ describe('models/MongoDB', () => {
       port: 20000
     })
     expect(db.url).toEqual(`mongodb://host2:20000/name2`)
+    expect(db.status).toEqual(MongoDB.STATUS_CREATED)
   })
 
   it('connect - invalid host error', async () => {
@@ -24,7 +25,7 @@ describe('models/MongoDB', () => {
     process.env.MONGODB_HOST = 'localhostt'
     process.env.MONGODB_PORT = 27017
 
-    expect.assertions(1)
+    expect.assertions(2)
 
     try {
       await db.connect()
@@ -36,6 +37,7 @@ describe('models/MongoDB', () => {
       expect(err.message).toMatch(
         /^failed to connect to server/
       )
+      expect(db.status).toEqual(MongoDB.STATUS_FAILED)
     }
   })
 
@@ -44,7 +46,7 @@ describe('models/MongoDB', () => {
     process.env.MONGODB_HOST = 'localhost'
     process.env.MONGODB_PORT = 27016
 
-    expect.assertions(1)
+    expect.assertions(2)
 
     db = new MongoDB()
     try {
@@ -57,6 +59,7 @@ describe('models/MongoDB', () => {
       expect(err.message).toMatch(
         /^failed to connect to server/
       )
+      expect(db.status).toEqual(MongoDB.STATUS_FAILED)
     }
   })
 
@@ -65,14 +68,18 @@ describe('models/MongoDB', () => {
     process.env.MONGODB_HOST = 'localhost'
     process.env.MONGODB_PORT = 27017
 
-    expect.assertions(1)
+    expect.assertions(4)
 
     db = new MongoDB()
     await db.connect()
       .then(result => {
         expect(result).toBe(true)
-        db.close()
-        return result
+        expect(db.status).toEqual(MongoDB.STATUS_CONNECTED)
+        return db.close()
+      })
+      .then(result => {
+        expect(result).toBe(true)
+        expect(db.status).toEqual(MongoDB.STATUS_CLOESED)
       })
       .catch(err => {
         console.error(err)
@@ -99,7 +106,7 @@ describe('models/MongoDB', () => {
         let schema = {
           name: String
         }
-        Dummy = MongoDB.model('Dummy', schema, 'dummies')
+        Dummy = db.model('Dummy', schema, 'dummies')
 
         const dummy = new Dummy({
           name: 'dummy1'
