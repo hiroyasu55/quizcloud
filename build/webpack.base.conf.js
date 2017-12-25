@@ -3,6 +3,7 @@ const path = require('path')
 const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
+const webpack = require('webpack')
 // const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 function resolve (dir) {
@@ -39,6 +40,11 @@ module.exports = {
       '@': resolve('src')
     }
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      // 'typeof window': '"object"'
+    })
+  ],
   module: {
     rules: [
       ...(config.dev.useEslint ? [createLintingRule()] : []),
@@ -56,7 +62,15 @@ module.exports = {
           require.resolve('bootstrap-vue')
         ]
       },
+      {
+        test: /\.node$/,
+        loader: 'node-loadersssssss'
+      },
       /*
+      {
+        test: /\.json$/,
+        loader: 'json-loader'
+      },
       {
         test: /\.css$/,
         use: ExtractTextPlugin.extract({

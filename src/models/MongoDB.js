@@ -16,6 +16,7 @@ class MongoDB {
     this._port = params.port || process.env.MONGODB_PORT
     this._status = MongoDB.STATUS_CREATED
   }
+  /*
 
   get status () {
     return this._status
@@ -51,8 +52,10 @@ class MongoDB {
         return true
       })
   }
+  */
 
-  model (name, schema, collection) {
+  static model (name, schema, collection) {
+    /*
     schema = schema || {}
     if (schema.createdAt === undefined) {
       schema.createdAt = Date
@@ -80,6 +83,10 @@ class MongoDB {
     })
 
     const model = mongoose.model(name, modelSchema)
+    */
+    const model = {
+      name, schema, collection
+    }
     return model
   }
 }

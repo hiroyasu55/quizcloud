@@ -95,7 +95,7 @@
 import { mapGetters, mapActions } from 'vuex'
 import store from '@/store'
 // import MongoDB from '@/models/MongoDB'
-import Quiz from '@/models/Quiz'
+// import Quiz from '@/models/Quiz'
 
 export default {
   name: 'Quiz',
@@ -115,8 +115,10 @@ export default {
     }
     store.commit('quiz/setMode', 'show')
     store.commit('quiz/setStatus', 'loading')
+    // console.log(mongoose)
     const task = () => {
       console.log(`getQuiz _id=${id}`)
+      /*
       const quiz = Quiz.findOne({_id: id})
         .then(result => {
           if (!result) {
@@ -127,6 +129,7 @@ export default {
             store.commit('quiz/setQuiz', quiz)
           }
         })
+      */
     }
     next(vm => {
       console.log(vm)
