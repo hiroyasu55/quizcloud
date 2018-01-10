@@ -4,21 +4,15 @@
       <b-nav-toggle target="nav_collapse"></b-nav-toggle>
 
       <b-link class="navbar-brand" to="/">
-       <span>Quiz Cloud</span>
+        <h1>Quiz Cloud</h1>
       </b-link>
 
       <b-collapse is-nav id="nav_collapse">
-
-        <b-navbar-nav>
-          <b-nav-item>Support</b-nav-item>
-          <b-nav-item>Docs</b-nav-item>
-          <b-nav-item>Contact Us</b-nav-item>
-        </b-navbar-nav>
-
         <b-navbar-nav class="ml-auto">
+          <b-nav-item>Support</b-nav-item>
           <b-nav-item-dropdown right>
             <template slot="button-content">
-              <span style="font-weight: bold;">User</span>
+              User
             </template>
 
             <b-dropdown-item to="#">Profile</b-dropdown-item>
@@ -30,3 +24,7 @@
     </b-navbar>
   </header>
 </template>
+<style lang="scss">
+header {
+  font-size: 1.6rem;
+}

@@ -62,11 +62,11 @@ module.exports = {
           require.resolve('bootstrap-vue')
         ]
       },
+      /*
       {
         test: /\.node$/,
-        loader: 'node-loadersssssss'
+        loader: 'node-loader'
       },
-      /*
       {
         test: /\.json$/,
         loader: 'json-loader'

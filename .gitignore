@@ -1,12 +1,12 @@
 .DS_Store
 node_modules/
-*.log*
+*.log
 /dist/
 /test/unit/coverage/
 /test/e2e/reports/
 /temp/*
 !/temp/.gitkeep
-/mongodb/
+*.env.js
 
 # Editor directories and files
 .idea

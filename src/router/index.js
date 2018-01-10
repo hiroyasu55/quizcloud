@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/Home'
+import ListView from '@/components/ListView'
 import QuizView from '@/components/QuizView'
 import Test from '@/components/Test'
 
@@ -10,12 +10,12 @@ const router = new Router({
   mode: 'history',
   routes: [
     {
-      path: '/home',
-      name: 'home',
+      path: '/list',
+      name: 'list',
       meta: {
-        title: 'Home'
+        title: 'List'
       },
-      component: Home
+      component: ListView
     },
     {
       path: '/quiz/:id?',
@@ -42,19 +42,15 @@ const router = new Router({
     {
       path: '/',
       name: 'index',
-      redirect: { name: 'Test', params: { value: 'XXX' } }
+      redirect: { name: 'Test', params: {value: 'index!'} }
     }
   ]
 })
 
 router.beforeEach((to, from, next) => {
-  console.log(`[router]beforeEach to=${to.name}`)
   const title = to.meta.title || '(No title)'
   document.title = `${title} - Quiz Cloud`
   next()
-})
-router.afterEach((to, from) => {
-  console.log(`[router]afterEach to=${to.name}`)
 })
 
 export default router
