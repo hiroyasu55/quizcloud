@@ -11,6 +11,11 @@ import headerView from '@/components/HeaderView'
 export default {
   title: 'no-title',
   name: 'app',
+  data () {
+    return {
+      tags: [ 'Vue.js', 'Feed', 'News', 'Tutorials' ]
+    }
+  },
   components: {
     headerView
   }
@@ -18,23 +23,8 @@ export default {
 </script>
 
 <style lang="scss">
-$baseFontSize: 1.5rem;
-html {
-  font-size: 62.5%;
-}
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI","Noto Sans Japanese","ヒラギノ角ゴ ProN W3", Meiryo, sans-serif;
-  font-size: $baseFontSize;
   padding-top: 70px;
-}
-.form-control {
-  font-size: $baseFontSize;
-}
-.btn {
-  font-size: $baseFontSize;
-}
-.col-form-legend {
-  font-size: $baseFontSize;
 }
 
 #app {

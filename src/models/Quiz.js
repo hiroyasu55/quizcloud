@@ -24,6 +24,17 @@ class Quiz extends Model {
     this.note = data.note || ''
     this.checkStatus = data.checkStatus || Quiz.CHECK_STATUS_DRAFT
 
+    this.voice = {
+      s3key: null,
+      url: null
+    }
+    if (data.voice) {
+      if (data.voice.s3key) this.voice.s3key = data.voice.s3key
+      if (data.voice.url) this.voice.url = data.voice.url
+      if (data.voice.createdAt) this.voice.createdAt = new Date(data.voice.createdAt)
+      if (data.voice.updatedAt) this.voice.updatedAt = new Date(data.voice.updatedAt)
+    }
+
     if (data.createdAt) this.createdAt = new Date(data.createdAt)
     if (data.updatedAt) this.updatedAt = new Date(data.updatedAt)
   }
@@ -44,6 +55,8 @@ class Quiz extends Model {
     data.note = this.note
     data.checkStatus = this.checkStatus
 
+    data.voice = this.voice
+
     data.createdAt = moment(this.createdAt).format()
     data.updatedAt = moment(this.updatedAt).format()
 
@@ -58,7 +71,20 @@ class Quiz extends Model {
       })
   }
 
-  static list (params) {
+  static list (options) {
+    const params = {}
+    console.log(`filter=${JSON.stringify(options)}`)
+    if (options) {
+      if (options.tags && Array.isArray(options.tags) && options.tags.length > 0) {
+        params.tags = options.tags.map(tag => {
+          const escapedTag = tag.replace(/0/g, '|')
+          console.log(`${tag}-${escapedTag}`)
+          return tag.replace(/0/g, '|')
+        }).join(',')
+      }
+    }
+    // console.log(`params=${JSON.stringify(params)}`)
+
     return Model.requestGet('quizes', params)
       .then(data => {
         const quizes = data.results.map(result => {
@@ -73,16 +99,17 @@ class Quiz extends Model {
       })
   }
 
-  update () {
+  update (options) {
     if (!this.id) {
       throw new Error(`Update error: id not defined.`)
     }
-    const params = {
-      quiz: this.toData()
+    const data = {
+      quiz: this.toData(),
+      options
     }
-    return Model.requestPut(`quizes/${this.id}`, params)
-      .then(data => {
-        const quiz = new Quiz(data.result)
+    return Model.requestPut(`quizes/${this.id}`, data)
+      .then(result => {
+        const quiz = new Quiz(result.result)
         return quiz
       })
   }

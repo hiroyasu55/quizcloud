@@ -1,4 +1,5 @@
 import Quiz from '@/models/Quiz'
+import Speaker from '@/models/Speaker'
 
 const defaultList = {
   quizes: [],
@@ -15,7 +16,7 @@ const quiz = {
     quiz: null,
     newQuiz: null,
     list: defaultList,
-    result: null
+    message: ''
   },
   getters: {
     status (state) {
@@ -33,8 +34,8 @@ const quiz = {
     list (state) {
       return state.list
     },
-    result (state) {
-      return state.result
+    message (state) {
+      return state.message
     }
   },
   mutations: {
@@ -52,6 +53,9 @@ const quiz = {
     },
     setList (state, list) {
       state.list = list
+    },
+    setMessage (state, message) {
+      state.message = message
     }
   },
   actions: {
@@ -99,6 +103,35 @@ const quiz = {
           console.error(err)
           commit('setQuiz', null)
           commit('setStatus', 'error')
+        })
+    },
+    speakQuestion ({ commit }, quiz) {
+      Promise.resolve()
+        .then(() => {
+          quiz = new Quiz(quiz)
+          if (quiz.voice && quiz.voice.url) {
+            return quiz
+          } else {
+            commit('setMessage', 'loading...')
+            return quiz.update({refreshSound: true})
+              .then(quiz => {
+                console.log(quiz.voice)
+                commit('setQuiz', quiz)
+                commit('setMessage', 'loaded.')
+                return quiz
+              })
+          }
+        })
+        .then(quiz => {
+          const speaker = new Speaker()
+          commit('setMessage', 'playing...')
+          return speaker.speak(quiz.voice.url)
+        })
+        .then(data => {
+          commit('setMessage', 'done')
+        })
+        .catch(err => {
+          commit('setMessage', err.message)
         })
     }
   }

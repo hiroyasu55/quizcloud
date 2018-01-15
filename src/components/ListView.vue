@@ -2,20 +2,24 @@
   <b-container fluid>
     <b-row class="justify-content-md-center">
       <b-col sm="8">
-        <b-row class="text-left">
-          <b-col sm="6">
-            <b-form-group horizontal label="タグ">
-              <b-input-group>
-                <b-form-input
-                  v-model="tagsFilter" />
-                <b-input-group-button>
-                  <b-btn :disabled="tagsFilter.length === 0"
-                    @click="tagsFilter = ''">×</b-btn>
-                </b-input-group-button>
-              </b-input-group>
-            </b-form-group>
-          </b-col>
-        </b-row>
+        <b-card class="search-panel">
+          <b-row>
+            <b-col sm="6">
+              <b-form-group horizontal label="タグ">
+                <b-input-group>
+                  <input-tag class="filter-tags" :tags="filter.tags"></input-tag>
+                </b-input-group>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row class="buttons-row">
+            <b-col>
+              <b-button variant="primary" @click="search(filter)">
+                検索
+              </b-button>
+            </b-col>
+          </b-row>
+        </b-card>
 
         <b-row class="loading" v-if="status === 'loading'">
           Loading...
@@ -69,6 +73,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import store from '@/store'
+import InputTag from 'vue-input-tag'
 
 const PER_PAGE = 10
 
@@ -84,27 +89,45 @@ export default {
     ...mapActions('quiz', {
       getList: 'getList'
     }),
+    search (filter) {
+      store.dispatch('quiz/getList', filter)
+    },
     offset (curPage) {
       return (curPage - 1) * PER_PAGE
     }
   },
   beforeRouteEnter (route, redirect, next) {
+    /*
     const params = {
       lastId: null
     }
     store.dispatch('quiz/getList', params)
+    */
     next()
   },
   data () {
     return {
-      tagsFilter: '',
+      filter: {
+        tags: []
+      },
       curPage: 1,
       perPage: PER_PAGE
     }
+  },
+  components: {
+    InputTag
   }
 }
 </script>
+
 <style lang="scss">
+.search-panel {
+  text-align: left;
+  margin-bottom: 1rem;
+  .buttons-row {
+    float: right;
+  }
+}
 .quizes {
   text-align: left;
   [class*="col-"] {
@@ -124,6 +147,8 @@ export default {
 .quizes-body {
 }
 
+.vue-input-tag-wrapper {
+}
 .list-row {
   .list-col {
     text-align: left;

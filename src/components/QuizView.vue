@@ -158,6 +158,18 @@
           </b-col>
         </b-form-row>
 
+        <b-form-row>
+          <b-col sm="2" class="header">
+            <label for="checkStatus">音声</label>
+          </b-col>
+          <b-col sm="10">
+            <b-button variant="primary" @click="speak(quiz)">
+              再生
+            </b-button>
+            <span v-text="quiz.voice.latest" />
+          </b-col>
+        </b-form-row>
+
         <b-row class="buttons-row" v-if="mode === 'show'">
           <b-button variant="primary" @click="updateMode(quiz)">
             編集
@@ -173,6 +185,11 @@
           <b-button variant="secondary" @click="abondon()">
             破棄
           </b-button>
+        </b-row>
+        <b-row>
+          <b-col>
+            <span v-text="message" />
+          </b-col>
         </b-row>
       </b-col>
     </b-row>
@@ -191,7 +208,8 @@ export default {
       status: 'status',
       mode: 'mode',
       quiz: 'quiz',
-      newQuiz: 'newQuiz'
+      newQuiz: 'newQuiz',
+      message: 'message'
     })
   },
   beforeRouteEnter (route, redirect, next) {
@@ -205,6 +223,7 @@ export default {
     next()
   },
   created: () => {
+    store.commit('quiz/setMessage', 'start')
   },
   methods: {
     updateMode (quiz) {
@@ -212,8 +231,10 @@ export default {
       store.commit('quiz/setNewQuiz', newQuiz)
       store.commit('quiz/setMode', 'update')
     },
+    speak (quiz) {
+      store.dispatch('quiz/speakQuestion', quiz)
+    },
     update (newQuiz) {
-      console.log(newQuiz)
       store.dispatch('quiz/updateQuiz', newQuiz)
       store.commit('quiz/setMode', 'show')
     },

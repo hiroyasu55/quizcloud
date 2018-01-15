@@ -11,9 +11,11 @@
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit --coverage && npm run e2e",
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs",
-    "build": "node build/build.js",
-    "babel-node": "babel-node",
-    "heroku-postbuild": "npm run build"
+    "build-stage": "NODE_ENV=staging node build/build.js",
+    "build-prod": "NODE_ENV=production node build/build.js",
+    "script": "NODE_ENV=test babel-node",
+    "heroku": "git push heroku master",
+    "heroku-postbuild": "npm run build-stage"
   },
   "dependencies": {
     "aws-sdk": "^2.168.0",
@@ -21,15 +23,19 @@
     "bootstrap": "^4.0.0-beta.2",
     "bootstrap-vue": "^1.3.0",
     "express": "^4.16.2",
+    "jquery": "^3.2.1",
     "moment": "^2.19.4",
     "nanoid": "^1.0.1",
+    "tag-it": "^2.0.0",
     "vue": "^2.5.9",
+    "vue-input-tag": "0.0.16",
     "vue-router": "^3.0.1",
     "vue-server-renderer": "^2.5.9",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.22.1",
     "babel-eslint": "^7.1.1",
     "babel-jest": "^21.0.2",
@@ -37,7 +43,7 @@
     "babel-plugin-dynamic-import-node": "^1.2.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-runtime": "^6.22.0",
-    "babel-preset-env": "^1.3.2",
+    "babel-preset-env": "^1.6.1",
     "babel-preset-stage-2": "^6.22.0",
     "babel-register": "^6.22.0",
     "bootstrap-sass": "^3.3.7",

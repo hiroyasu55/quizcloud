@@ -3,6 +3,7 @@ import axios from 'axios'
 const BASE_CONFIG = {
   baseURL: process.env.API_URL,
   headers: {
+    // 'Access-Control-Allow-Origin': '*',
     'Authorization': `Bearer ${process.env.API_TOKEN}`
   }
 }
@@ -18,6 +19,7 @@ class Model {
     const config = Object.assign(BASE_CONFIG, {
       params: params
     })
+    console.log(config)
     return axios.get(url, config)
       .then(resp => {
         if (resp.status !== 200) {

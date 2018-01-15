@@ -2,16 +2,16 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import ListView from '@/components/ListView'
 import QuizView from '@/components/QuizView'
-import Test from '@/components/Test'
+import TestView from '@/components/TestView'
 
 Vue.use(Router)
 
 const router = new Router({
-  mode: 'history',
+  // mode: 'history',
   routes: [
     {
       path: '/list',
-      name: 'list',
+      name: 'List',
       meta: {
         title: 'List'
       },
@@ -24,12 +24,6 @@ const router = new Router({
         title: 'Quiz'
       },
       component: QuizView
-      /*
-      beforeEnter: (to, from, next) => {
-        console.log(`[router]beforeEnter to=${to.name}`)
-        next()
-      }
-      */
     },
     {
       path: '/test/:value?',
@@ -37,12 +31,13 @@ const router = new Router({
       meta: {
         title: 'Test'
       },
-      component: Test
+      component: TestView
     },
     {
       path: '/',
       name: 'index',
-      redirect: { name: 'Test', params: {value: 'index!'} }
+      redirect: { name: 'List' }
+      // redirect: { name: 'Test', params: {value: 'index'} }
     }
   ]
 })

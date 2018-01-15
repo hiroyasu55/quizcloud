@@ -36,6 +36,4 @@ export default {
 }
 </script>
 <style lang="scss">
-.container {
-}
 </style>

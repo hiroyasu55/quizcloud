@@ -4,7 +4,7 @@
       <b-nav-toggle target="nav_collapse"></b-nav-toggle>
 
       <b-link class="navbar-brand" to="/">
-        <h1>Quiz Cloud</h1>
+        Quiz Cloud
       </b-link>
 
       <b-collapse is-nav id="nav_collapse">
@@ -26,5 +26,6 @@
 </template>
 <style lang="scss">
 header {
-  font-size: 1.6rem;
+  font-size: 1rem;
 }
+</style>
