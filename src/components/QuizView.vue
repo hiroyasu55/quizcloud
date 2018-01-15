@@ -116,10 +116,9 @@
                 <span v-for="tag in quiz.tags" :key="tag"
                   v-text="tag" class="tag" />
               </div>
-              <b-form-input
-                v-if="['add', 'update'].includes(mode) && newQuiz"
-                id="tags"
-                v-model="newQuiz.tags" />
+              <div v-if="['add', 'update'].includes(mode) && newQuiz">
+                <input-tag class="filter-tags" :tags="newQuiz.tags"></input-tag>
+              </div>
             </b-col>
           </b-form-row>
 
@@ -146,15 +145,16 @@
           </b-col>
           <b-col sm="10">
             <div v-if="mode === 'show'">
-              <b-badge v-if="quiz.checkStatus === 'valid'"
-                variant="primary">有効</b-badge>
-              <b-badge v-if="quiz.checkStatus === 'draft'"
-                variant="secondary">下書き</b-badge>
+              <b-badge variant="primary"
+                v-text="checkStatusText(quiz.checkStatus)" />
             </div>
-            <b-form-input
-              v-if="['add', 'update'].includes(mode) && newQuiz"
-              id="checkStatus"
-              v-model="newQuiz.checkStatus" />
+            <b-form-group v-if="['add', 'update'].includes(mode) && newQuiz">
+              <b-form-radio-group
+                v-model="newQuiz.checkStatus"
+                :options="checkStatusOptions"
+                plain
+                name="checkStatus" />
+            </b-form-group>
           </b-col>
         </b-form-row>
 
@@ -163,10 +163,29 @@
             <label for="checkStatus">音声</label>
           </b-col>
           <b-col sm="10">
-            <b-button variant="primary" @click="speak(quiz)">
+            <b-button
+              v-if="['stop', 'pause'].includes(speaker.status)"
+              variant="primary"
+              :disabled="!['stop', 'pause'].includes(speaker.status)"
+              @click="speakQuestion(speaker, quiz)">
               再生
             </b-button>
+            <b-button
+              variant="primary"
+              :disabled="!['stop', 'pause'].includes(speaker.status)"
+              @click="speakQuestion(speaker, quiz)">
+              再生
+            </b-button>
+            <b-button
+              variant="primary"
+              :disabled="!['play'].includes(speaker.status)"
+              @click="stopSpeaker(speaker)">
+              停止
+            </b-button>
             <span v-text="quiz.voice.latest" />
+            <p>
+              <span v-text="speaker.status" />
+            </p>
           </b-col>
         </b-form-row>
 
@@ -200,6 +219,12 @@
 import { mapGetters } from 'vuex'
 import store from '@/store'
 import Quiz from '@/models/Quiz'
+import InputTag from 'vue-input-tag'
+
+const CHECK_STATUSES = {
+  'valid': '有効',
+  'draft': '下書き'
+}
 
 export default {
   name: 'Quiz',
@@ -209,8 +234,18 @@ export default {
       mode: 'mode',
       quiz: 'quiz',
       newQuiz: 'newQuiz',
+      speaker: 'speaker',
       message: 'message'
-    })
+    }),
+    checkStatusOptions () {
+      return Object.keys(CHECK_STATUSES).map(value => {
+        return { value: value, text: CHECK_STATUSES[value] }
+      })
+    }
+  },
+  data () {
+    return {
+    }
   },
   beforeRouteEnter (route, redirect, next) {
     const id = route.params.id || null
@@ -226,13 +261,19 @@ export default {
     store.commit('quiz/setMessage', 'start')
   },
   methods: {
+    checkStatusText (value) {
+      return CHECK_STATUSES[value] || '不明'
+    },
     updateMode (quiz) {
       const newQuiz = new Quiz(quiz)
       store.commit('quiz/setNewQuiz', newQuiz)
       store.commit('quiz/setMode', 'update')
     },
-    speak (quiz) {
-      store.dispatch('quiz/speakQuestion', quiz)
+    speakQuestion (speaker, quiz) {
+      store.dispatch('quiz/speakQuestion', {speaker, quiz})
+    },
+    stopSpeaker (speaker) {
+      store.dispatch('quiz/stopSpeaker', speaker)
     },
     update (newQuiz) {
       store.dispatch('quiz/updateQuiz', newQuiz)
@@ -242,6 +283,9 @@ export default {
       store.commit('quiz/setNewQuiz', null)
       store.commit('quiz/setMode', 'show')
     }
+  },
+  components: {
+    InputTag
   }
 }
 </script>

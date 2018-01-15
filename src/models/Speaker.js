@@ -1,4 +1,4 @@
-import S3 from './S3'
+// import S3 from './S3'
 // import fs from 'fs'
 // import path from 'path'
 
@@ -24,8 +24,10 @@ const createAudioFile = (data, filename) => {
 
 class Speaker {
   constructor () {
+    // this.s3 = new S3()
     this.context = new AudioContext()
-    this.s3 = new S3()
+    this.source = null
+    this.status = 'stop'
   }
 
   getAudioBuffer (url) {
@@ -48,15 +50,51 @@ class Speaker {
       req.send('')
     })
       .then(data => {
-        console.log('success0')
         return this.context.decodeAudioData(data)
       })
       .then(buffer => {
-        console.log('success1')
         return buffer
       })
   }
 
+  onended (event) {
+    console.log(`- Speaker ended on ${event.type}.`)
+  }
+
+  play (url) {
+    // const url = `https://s3-ap-northeast-1.amazonaws.com/quizcloud-server-dev/${key}`
+    // url = `https://s3-ap-northeast-1.amazonaws.com/quizcloud-voices-dev/xxx1.mp3`
+    console.log(url)
+    return this.getAudioBuffer(url)
+      .then(audioBuffer => {
+        const source = this.context.createBufferSource()
+        source.buffer = audioBuffer
+        source.loop = false
+        source.loopStart = 0
+        source.loopEnd = audioBuffer.duration
+        source.connect(this.context.destination)
+        source.onended = (event) => {
+          source.onended = null
+          this.status = 'stop'
+          console.log(`Speaker ended on ${event.type}.`)
+          this.onended(event)
+        }
+        return source
+      })
+      .then(source => {
+        this.source = source
+        this.source.start(0)
+        this.status = 'play'
+        return true
+      })
+  }
+  stop () {
+    if (!this.source) {
+      console.log('no source')
+      return
+    }
+    this.source.stop(0)
+  }
   speak1 (key) {
     // key = `2ebfe99ac1bef30ea80de560_question.mp3`
     key = `xxx1.mp3`
@@ -96,27 +134,6 @@ class Speaker {
           console.log(file)
           return file
         })
-      */
-  }
-
-  speak (url) {
-    // const url = `https://s3-ap-northeast-1.amazonaws.com/quizcloud-server-dev/${key}`
-    // url = `https://s3-ap-northeast-1.amazonaws.com/quizcloud-voices-dev/xxx1.mp3`
-    console.log(url)
-    const a = new Audio(url)
-    a.play()
-    /*
-    return this.getAudioBuffer(url)
-      .then(buffer => {
-        console.log(buffer.toString('hex').substring(0, 8))
-        const source = this.context.createBufferSource()
-        source.buffer = buffer
-        source.connect(this.context.destination)
-        source.start(0)
-        return true
-      })
-    */
-    /*
       */
   }
 }

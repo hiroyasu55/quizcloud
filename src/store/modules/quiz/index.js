@@ -16,6 +16,9 @@ const quiz = {
     quiz: null,
     newQuiz: null,
     list: defaultList,
+    speaker: new Speaker(),
+    // playerSource: null,
+    playerStatus: 'none',
     message: ''
   },
   getters: {
@@ -33,6 +36,12 @@ const quiz = {
     },
     list (state) {
       return state.list
+    },
+    speaker (state) {
+      return state.speaker
+    },
+    playerStatus (state) {
+      return state.playerStatus
     },
     message (state) {
       return state.message
@@ -53,6 +62,12 @@ const quiz = {
     },
     setList (state, list) {
       state.list = list
+    },
+    setSpeaker (state, speaker) {
+      state.speaker = speaker
+    },
+    setPlayerStatus (state, playerStatus) {
+      state.playerStatus = playerStatus
     },
     setMessage (state, message) {
       state.message = message
@@ -105,7 +120,7 @@ const quiz = {
           commit('setStatus', 'error')
         })
     },
-    speakQuestion ({ commit }, quiz) {
+    speakQuestion ({ commit }, {speaker, quiz}) {
       Promise.resolve()
         .then(() => {
           quiz = new Quiz(quiz)
@@ -123,16 +138,23 @@ const quiz = {
           }
         })
         .then(quiz => {
-          const speaker = new Speaker()
-          commit('setMessage', 'playing...')
-          return speaker.speak(quiz.voice.url)
+          speaker.onended = (event) => {
+            console.log('ended')
+            commit('setMessage', 'stop.')
+          }
+          return speaker.play(quiz.voice.url)
         })
-        .then(data => {
-          commit('setMessage', 'done')
+        .then(result => {
+          commit('setMessage', 'playing...')
         })
         .catch(err => {
           commit('setMessage', err.message)
         })
+    },
+    stopSpeaker ({ commit }, speaker) {
+      console.log(`stopSpeaker`)
+      commit('setMessage', 'stoping...')
+      speaker.stop()
     }
   }
 }

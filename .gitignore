@@ -6,8 +6,7 @@ node_modules/
 /test/e2e/reports/
 /temp/*
 !/temp/.gitkeep
-.env
-.env.*
+config/*.env.js
 
 # Editor directories and files
 .idea
