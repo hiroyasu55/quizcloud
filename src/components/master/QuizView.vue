@@ -2,33 +2,6 @@
   <b-container fluid>
     <b-row class="justify-content-md-center">
       <b-col sm="8" class="quiz">
-        <b-row class="buttons-row" v-if="status === 'done'">
-          <b-col sm="12">
-            <b-button v-if="mode === 'show'" class="float-right"
-              variant="primary" @click="changeMode('update', quiz)">
-              編集
-            </b-button>
-            <b-button v-if="mode === 'show'" class="float-right"
-              variant="success" @click="changeMode('add')">
-              新規
-            </b-button>
-
-            <b-button v-if="mode === 'add'" class="float-right"
-              variant="primary" @click="add(newQuiz)">
-              登録
-            </b-button>
-            <b-button v-if="mode === 'update'" class="float-right"
-              variant="primary" @click="update(newQuiz)">
-              更新
-            </b-button>
-            <b-button v-if="mode === 'add' || mode === 'update'"
-              class="float-right"
-              variant="secondary" @click="abondon(mode)">
-              破棄
-            </b-button>
-          </b-col>
-        </b-row>
-
         <b-row>
           <span v-if="status === 'loading'" class="loading">
             Loading...
@@ -38,7 +11,36 @@
           </span>
         </b-row>
 
-        <b-form v-if="status === 'done'">
+        <b-form v-if="status === 'done'" id="quiz-form">
+          <b-row class="buttons-row" v-if="status === 'done'">
+            <b-col sm="12">
+              <b-button v-if="mode === 'show'" class="float-right"
+                variant="primary" @click="changeMode('update', quiz)">
+                編集
+              </b-button>
+              <b-button v-if="mode === 'show'" class="float-right"
+                variant="success" @click="changeMode('add')">
+                新規
+              </b-button>
+
+              <b-button v-if="mode === 'add'" class="float-right"
+                type="submit" variant="primary"
+                @click="add(newQuiz)">
+                登録
+              </b-button>
+              <b-button v-if="mode === 'update'" class="float-right"
+                type="submit" variant="primary"
+                @click="update(newQuiz)">
+                更新
+              </b-button>
+              <b-button v-if="mode === 'add' || mode === 'update'"
+                class="float-right"
+                variant="danger" @click="abondon(mode)">
+                破棄
+              </b-button>
+            </b-col>
+          </b-row>
+
           <b-form-row>
             <b-col sm="2" class="header">
               <label for="question">ID</label>
@@ -73,10 +75,10 @@
             </b-col>
             <b-col sm="10">
               <span v-if="mode === 'show'" v-text="quiz.answer" />
-              <b-form-input
+              <b-form-input id="answer"
                 v-if="['add', 'update'].includes(mode) && newQuiz"
-                id="answer"
-                v-model="newQuiz.answer" />
+                v-model="newQuiz.answer" required />
+              <p class="invalid-feedback">invalid</p>
             </b-col>
           </b-form-row>
 
@@ -86,10 +88,9 @@
             </b-col>
             <b-col sm="10">
               <span v-if="mode === 'show'" v-text="quiz.answerKana" />
-              <b-form-input
+              <b-form-input id="answerKana"
                 v-if="['add', 'update'].includes(mode) && newQuiz"
-                id="answerKana"
-                v-model="newQuiz.answerKana" />
+                v-model="newQuiz.answerKana" required />
             </b-col>
           </b-form-row>
 
@@ -210,6 +211,7 @@
         <b-row>
           <b-col>
             <span v-text="message" />
+            status={{status}}
           </b-col>
         </b-row>
 
@@ -228,6 +230,15 @@ import InputTag from 'vue-input-tag'
 const CHECK_STATUSES = {
   'valid': '有効',
   'draft': '下書き'
+}
+
+const validateQuiz = (quiz) => {
+  if (!quiz.answer || quiz.answer.trim().length === 0) {
+    alert(`Question is needed`)
+    return false
+  }
+
+  return true
 }
 
 export default {
@@ -254,10 +265,13 @@ export default {
   beforeRouteEnter (route, redirect, next) {
     const params = route.params || {}
     const query = route.query || {}
-    const mode = query.mode || 'show'
-    console.log('mode=' + mode)
+    let mode = query.mode || 'show'
 
+    if (!params.id || params.id.length === 0) {
+      mode = 'add'
+    }
     if (mode === 'show') {
+      console.log('id=' + params.id)
       if (!params.id || params.id.length === 0) {
         store.commit('quiz/setStatus', 'error')
         store.commit('quiz/setMessage', 'id not defined.')
@@ -279,11 +293,11 @@ export default {
       store.commit('quiz/setMessage', `invalid mode ${mode}`)
       return next()
     }
-
     store.commit('quiz/setMode', mode)
     next()
   },
   created: () => {
+    console.log('master')
   },
   methods: {
     checkStatusText (value) {
@@ -299,13 +313,29 @@ export default {
       }
       store.commit('quiz/setMode', mode)
     },
+    onSubmit (event) {
+      alert(JSON.stringify(event))
+      event.preventDefault()
+      // console.log(event)
+      // console.log(mode)
+    },
     add (newQuiz) {
+      if (!validateQuiz(newQuiz)) {
+        return
+      }
       store.dispatch('quiz/addQuiz', newQuiz)
-      store.commit('quiz/setMode', 'show')
     },
     update (newQuiz) {
+      const form = document.getElementById('quiz-form')
+      const result = form.checkValidity()
+      form.classList.add('was-validated')
+      console.log(result)
+      /*
+      if (!validateQuiz(newQuiz)) {
+        return
+      }
       store.dispatch('quiz/updateQuiz', newQuiz)
-      store.commit('quiz/setMode', 'show')
+      */
     },
     abondon (mode) {
       // if (mode === 'add')
@@ -323,9 +353,6 @@ export default {
     },
     resumeSpeaker (speaker) {
       store.dispatch('quiz/resumeSpeaker', speaker)
-    },
-    dummy () {
-      window.location.href = '/list'
     }
   },
   components: {

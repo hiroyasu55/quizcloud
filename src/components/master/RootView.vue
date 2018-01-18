@@ -10,10 +10,10 @@ import headerView from '@/components/master/HeaderView'
 
 export default {
   title: 'no-title',
-  name: 'Master',
+  name: 'master',
   data () {
     return {
-      tags: []
+      tags: [ 'Vue.js', 'Feed', 'News', 'Tutorials' ]
     }
   },
   components: {

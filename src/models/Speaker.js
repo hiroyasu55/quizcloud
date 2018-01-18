@@ -27,7 +27,7 @@ class Speaker {
     // this.s3 = new S3()
     this.context = new AudioContext()
     this.source = null
-    this.status = 'stop'
+    this.status = 'stopped'
   }
 
   getAudioBuffer (url) {
@@ -64,7 +64,7 @@ class Speaker {
   play (url) {
     // const url = `https://s3-ap-northeast-1.amazonaws.com/quizcloud-server-dev/${key}`
     // url = `https://s3-ap-northeast-1.amazonaws.com/quizcloud-voices-dev/xxx1.mp3`
-    console.log(url)
+    console.log(`play status=${this.status},url=${url}`)
     return this.getAudioBuffer(url)
       .then(audioBuffer => {
         const source = this.context.createBufferSource()
@@ -75,7 +75,7 @@ class Speaker {
         source.connect(this.context.destination)
         source.onended = (event) => {
           source.onended = null
-          this.status = 'stop'
+          this.status = 'stopped'
           console.log(`Speaker ended on ${event.type}.`)
           this.onended(event)
         }
@@ -84,17 +84,42 @@ class Speaker {
       .then(source => {
         this.source = source
         this.source.start(0)
-        this.status = 'play'
+        this.status = 'running'
         return true
       })
   }
   stop () {
+    console.log(`${this.context.state} -> stop`)
     if (!this.source) {
       console.log('no source')
       return
     }
     this.source.stop(0)
+    this.source = null
+    // this.context.close()
+    this.status = 'stopped'
   }
+  suspend () {
+    console.log(`${this.context.state} -> suspend`)
+    if (this.context.state !== 'running') return
+    this.context.suspend()
+      .then(() => {
+        console.log(`state=${this.context.state}`)
+        this.status = 'suspended'
+        console.log(`suspended.`)
+      })
+  }
+  resume () {
+    console.log(`${this.context.state} -> resume`)
+    if (this.context.state !== 'suspended') return
+    this.context.resume()
+      .then(() => {
+        console.log(`state=${this.context.state}`)
+        this.status = 'playing'
+        console.log(`resumed.`)
+      })
+  }
+  /*
   speak1 (key) {
     // key = `2ebfe99ac1bef30ea80de560_question.mp3`
     key = `xxx1.mp3`
@@ -104,16 +129,6 @@ class Speaker {
         // const ab = new Uint8Array(buffer)
         const source = this.context.createBufferSource()
         // for (let )
-        /*
-        var frameCount = this.context.sampleRate * 2.0
-        const audioBuffer = this.context.createBuffer(2, frameCount, this.context.sampleRate)
-        for (var channel = 0; channel < 2; channel++) {
-          var nowBuffering = audioBuffer.getChannelData(channel)
-          for (var i = 0; i < frameCount; i++) {
-            nowBuffering[i] = Math.random() * 2 - 1
-          }
-        }
-        */
         // const audioBuffer = this.context.decodeAudioData(data.buffer)
         // source.buffer = audioBuffer
         source.buffer = data.buffer
@@ -125,17 +140,8 @@ class Speaker {
         console.error(err)
         throw err
       })
-      /*
-      console.log(buffer.toString('hex').substring(0, 8))
-      const file = path.join(__dirname, `../temp/${key}.mp3`)
-      console.log(`dir=${__dirname}`)
-      return createAudioFile(buffer, file)
-        .then(file => {
-          console.log(file)
-          return file
-        })
-      */
   }
+  */
 }
 
 export default Speaker

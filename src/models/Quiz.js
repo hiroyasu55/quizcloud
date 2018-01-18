@@ -26,11 +26,13 @@ class Quiz extends Model {
 
     this.voice = {
       s3key: null,
-      url: null
+      url: null,
+      latest: false
     }
     if (data.voice) {
       if (data.voice.s3key) this.voice.s3key = data.voice.s3key
       if (data.voice.url) this.voice.url = data.voice.url
+      if (data.voice.latest) this.voice.latest = data.voice.latest
       if (data.voice.createdAt) this.voice.createdAt = new Date(data.voice.createdAt)
       if (data.voice.updatedAt) this.voice.updatedAt = new Date(data.voice.updatedAt)
     }
@@ -45,6 +47,7 @@ class Quiz extends Model {
     data.question = this.question
     data.answer = this.answer
     data.answerKana = this.answerKana
+    this.answers = this.answers || []
     data.answers = this.answers.map(a => {
       return {
         answer: a.answer,
@@ -90,12 +93,29 @@ class Quiz extends Model {
         const quizes = data.results.map(result => {
           return (new Quiz(result)).toData()
         })
-        return {
+        const result = {
           quizes: quizes,
           count: data.count,
           limit: data.limit,
           lastId: data.lastId
         }
+        console.log(result.count)
+        return result
+      })
+  }
+
+  add (options) {
+    if (this.id) {
+      throw new Error(`Add error: id not to be defined.`)
+    }
+    const data = {
+      quiz: this.toData(),
+      options
+    }
+    return Model.requestPost(`quizes`, data)
+      .then(result => {
+        const quiz = new Quiz(result.result)
+        return quiz
       })
   }
 

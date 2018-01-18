@@ -29,6 +29,17 @@ class Model {
       })
   }
 
+  static requestPost (url, data) {
+    const config = Object.assign(BASE_CONFIG, {})
+    return axios.post(url, data, config)
+      .then(resp => {
+        if (resp.status !== 200) {
+          throw new Error(`Request error, url=${url}, code=${resp.status}`)
+        }
+        return resp.data
+      })
+  }
+
   static requestPut (url, data) {
     const config = Object.assign(BASE_CONFIG, {})
     return axios.put(url, data, config)

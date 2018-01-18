@@ -107,16 +107,29 @@ const quiz = {
           commit('setStatus', 'error')
         })
     },
+    addQuiz ({ commit }, quiz) {
+      commit('setStatus', 'loading')
+      quiz.add()
+        .then(quiz => {
+          commit('setQuiz', quiz)
+          commit('setStatus', 'done')
+          commit('setMode', 'show')
+        })
+        .catch(err => {
+          console.error(err)
+          commit('setStatus', 'error')
+        })
+    },
     updateQuiz ({ commit }, quiz) {
       commit('setStatus', 'loading')
       quiz.update()
         .then(quiz => {
           commit('setQuiz', quiz)
           commit('setStatus', 'done')
+          commit('setMode', 'show')
         })
         .catch(err => {
           console.error(err)
-          commit('setQuiz', null)
           commit('setStatus', 'error')
         })
     },
@@ -124,7 +137,8 @@ const quiz = {
       Promise.resolve()
         .then(() => {
           quiz = new Quiz(quiz)
-          if (quiz.voice && quiz.voice.url) {
+          console.log(`quiz.voice.latest=${quiz.voice.latest}`)
+          if (quiz.voice && quiz.voice.url && quiz.voice.latest) {
             return quiz
           } else {
             commit('setMessage', 'loading...')
@@ -139,7 +153,6 @@ const quiz = {
         })
         .then(quiz => {
           speaker.onended = (event) => {
-            console.log('ended')
             commit('setMessage', 'stop.')
           }
           return speaker.play(quiz.voice.url)
@@ -155,6 +168,16 @@ const quiz = {
       console.log(`stopSpeaker`)
       commit('setMessage', 'stoping...')
       speaker.stop()
+    },
+    suspendSpeaker ({ commit }, speaker) {
+      console.log(`suspendSpeaker`)
+      commit('setMessage', 'suspending...')
+      speaker.suspend()
+    },
+    resumeSpeaker ({ commit }, speaker) {
+      console.log(`resumeSpeaker`)
+      commit('setMessage', 'resumeing...')
+      speaker.resume()
     }
   }
 }
